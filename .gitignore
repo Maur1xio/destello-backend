@@ -1,0 +1,30 @@
+# --- dependencias y builds ---
+node_modules/
+dist/
+build/
+coverage/
+.nyc_output/
+.tmp/
+temp/
+# PM2, nodemon, ts-node-dev
+pids/
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# --- variables de entorno / claves ---
+.env
+.env.*        # .env.development, .env.production, etc.
+# --- editor / sistema operativo ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+# --- test & tooling ---
+jest-html-reporters-*
+/coverage
+# --- Docker / CI artefacts ---
+*.local
+docker-compose.override.yml

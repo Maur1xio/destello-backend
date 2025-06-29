@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:8.0
+    container_name: destelloDB
+    ports:
+      - "27017:27017"
+    volumes:
+      - /home/awadeLATAM/Desktop/destelloDb:/data/db
+    restart: unless-stopped
+    networks: [app-net]
+
+  backend:
+    build: .
+    container_name: destello-backend
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017/destello_shop
+      PORT: "3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+    restart: unless-stopped
+    command: ["node", "src/app.js"]
+    networks: [app-net]
+
+networks:
+  app-net:          
