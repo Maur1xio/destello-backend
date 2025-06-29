@@ -23,9 +23,13 @@ services:
       - "3000:3000"
     volumes:
       - .:/usr/src/app
+      - backend_node_modules:/usr/src/app/node_modules
     restart: unless-stopped
     command: ["node", "src/app.js"]
     networks: [app-net]
 
 networks:
-  app-net:          
+  app-net:
+
+volumes:
+  backend_node_modules:
