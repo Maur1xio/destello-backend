@@ -1,5 +1,4 @@
-// src/app.js
-require('dotenv').config();
+
 const express   = require('express');
 const mongoose  = require('mongoose');
 const swaggerUi = require('swagger-ui-express');
@@ -7,10 +6,8 @@ const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
 
-// ---------- Middlewares ----------
 app.use(express.json());
 
-// ---------- Swagger ----------
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -19,24 +16,22 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'Documentación de la API de Destello Shop',
     },
-    servers: [{ url: `http://localhost:${process.env.PORT || 3000}` }],
+    servers: [{ url: `http://localhost:${3000}` }],
   },
-  apis: ['./src/routes/*.js'],    // ajusta si tus rutas están en otro sitio
+  apis: ['./src/routes/*.js'],
 };
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ---------- Ruta de prueba ----------
 app.get('/', (_req, res) => {
   res.send('🚀 Destello Shop API is up and running');
 });
 
-// ---------- Conexión a Mongo y arranque ----------
 mongoose.set('bufferCommands', false);
 
-const PORT = process.env.PORT || 3000;
+const PORT =  3000;
 mongoose
-  .connect(process.env.MONGO_URI, {
+  .connect("mongodb://mongo:27017/destello_shop", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

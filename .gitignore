@@ -1,30 +1,38 @@
-# --- dependencias y builds ---
+# --- Node ---
 node_modules/
-dist/
-build/
-coverage/
-.nyc_output/
-.tmp/
-temp/
-# PM2, nodemon, ts-node-dev
-pids/
-logs/
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-# --- variables de entorno / claves ---
-.env
-.env.*        # .env.development, .env.production, etc.
-# --- editor / sistema operativo ---
+pnpm-debug.log*
+
+
+# --- Logs y dumps ---
+logs/
+*.log
+*.pid
+*.seed
+*.pid.lock
+dump.rdb
+core.*
+*.sqlite
+
+# --- Directorios temporales ---
+tmp/
+temp/
+.cache/
+dist/
+coverage/
+
+# --- Docker artefacts ---
+*.tar
+.dockerignore
+
+# --- VS Code / IDE ---
 .vscode/
 .idea/
-*.swp
+*.sw?
+*.iml
+
+# --- Sistema operativo ---
 .DS_Store
 Thumbs.db
-# --- test & tooling ---
-jest-html-reporters-*
-/coverage
-# --- Docker / CI artefacts ---
-*.local
-docker-compose.override.yml
