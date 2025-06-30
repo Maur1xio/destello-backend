@@ -48,6 +48,17 @@ router.get('/slug/:slug', optionalAuth, CategoryController.getCategoryBySlug);
 
 /**
  * @swagger
+ * /api/categories/stats:
+ *   get:
+ *     summary: Obtener estadísticas de categorías (Admin)
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get('/stats', requireAuth, requireAdmin, CategoryController.getCategoryStats);
+
+/**
+ * @swagger
  * /api/categories/{categoryId}:
  *   get:
  *     summary: Obtener categoría por ID
@@ -110,16 +121,5 @@ router.put('/:categoryId', requireAuth, requireAdmin, CategoryController.updateC
  *       - bearerAuth: []
  */
 router.delete('/:categoryId', requireAuth, requireAdmin, CategoryController.deleteCategory);
-
-/**
- * @swagger
- * /api/categories/stats:
- *   get:
- *     summary: Obtener estadísticas de categorías (Admin)
- *     tags: [Categories]
- *     security:
- *       - bearerAuth: []
- */
-router.get('/stats', requireAuth, requireAdmin, CategoryController.getCategoryStats);
 
 module.exports = router; 
