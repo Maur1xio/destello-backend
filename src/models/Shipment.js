@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { SHIPMENT_STATUS } = require('../config/constants');
+const { SHIPMENT_STATUS, SHIPMENT_CARRIERS } = require('../config/constants');
 
 // ===== SUBDOCUMENT SCHEMAS =====
 const ShipmentItemSchema = new mongoose.Schema({
@@ -32,7 +32,7 @@ const ShipmentSchema = new mongoose.Schema({
   carrier: {
     type: String,
     required: [true, 'La empresa de envío es requerida'],
-    enum: ['dhl', 'fedex', 'ups', 'correos_mexico', 'paquetexpress']
+    enum: Object.values(SHIPMENT_CARRIERS)
   },
   status: {
     type: String,
