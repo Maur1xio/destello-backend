@@ -50,31 +50,31 @@ const validate = (schema) => {
 // ===== COMMON VALIDATION SCHEMAS =====
 const commonSchemas = {
   // MongoDB ObjectId
-  objectId: Joi.string().hex().length(24).message('ID inválido'),
+  objectId: Joi.string().hex().length(24),
   
   // Email
-  email: Joi.string().email().lowercase().max(100).message('Email inválido'),
+  email: Joi.string().email().lowercase().max(100),
   
   // Password
-  password: Joi.string().min(6).max(128).message('La contraseña debe tener entre 6 y 128 caracteres'),
+  password: Joi.string().min(6).max(128),
   
   // Names
-  name: Joi.string().trim().min(1).max(50).message('El nombre debe tener entre 1 y 50 caracteres'),
+  name: Joi.string().trim().min(1).max(50),
   
   // Phone
-  phone: Joi.string().pattern(/^\+?[\d\s\-\(\)]+$/).message('Número de teléfono inválido'),
+  phone: Joi.string().pattern(/^\+?[\d\s\-\(\)]+$/),
   
   // SKU
-  sku: Joi.string().trim().uppercase().min(3).max(20).message('SKU debe tener entre 3 y 20 caracteres'),
+  sku: Joi.string().trim().uppercase().min(3).max(20),
   
   // Price
-  price: Joi.number().positive().precision(2).message('El precio debe ser un número positivo'),
+  price: Joi.number().positive().precision(2),
   
   // Quantity
-  quantity: Joi.number().integer().min(1).message('La cantidad debe ser un número entero positivo'),
+  quantity: Joi.number().integer().min(1),
   
   // Rating
-  rating: Joi.number().integer().min(1).max(5).message('La calificación debe ser entre 1 y 5'),
+  rating: Joi.number().integer().min(1).max(5),
   
   // Pagination
   page: Joi.number().integer().min(1).default(1),
@@ -99,7 +99,7 @@ const userSchemas = {
   login: {
     body: Joi.object({
       email: commonSchemas.email.required(),
-      password: Joi.string().required().message('La contraseña es requerida')
+      password: Joi.string().required()
     })
   },
 
@@ -108,7 +108,7 @@ const userSchemas = {
       firstName: commonSchemas.name.optional(),
       lastName: commonSchemas.name.optional(),
       phone: commonSchemas.phone.optional()
-    }).min(1).message('Debe proporcionar al menos un campo para actualizar')
+    }).min(1)
   },
 
   addAddress: {
@@ -161,7 +161,7 @@ const productSchemas = {
       categories: Joi.array().items(commonSchemas.objectId).min(1).optional(),
       isFeatured: Joi.boolean().optional(),
       isActive: Joi.boolean().optional()
-    }).min(1).message('Debe proporcionar al menos un campo para actualizar')
+    }).min(1)
   },
 
   getAll: {

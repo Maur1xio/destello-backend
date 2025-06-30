@@ -1,5 +1,5 @@
 const ProductService = require('../services/productService');
-const { AsyncHandler } = require('../middlewares/errorHandler');
+const { asyncHandler, AppError } = require('../middlewares/errorHandler');  
 const Joi = require('joi');
 
 /**
@@ -201,8 +201,10 @@ class ProductController {
    *                       items:
    *                         $ref: '#/components/schemas/Product'
    */
-  static getAllProducts = AsyncHandler(async (req, res) => {
+  static getAllProducts = asyncHandler(async (req, res) => {
     const filtersSchema = Joi.object({
+      page: Joi.number().integer().min(1).default(1),
+      limit: Joi.number().integer().min(1).max(100).default(20),
       category: Joi.string().optional(),
       minPrice: Joi.number().min(0).optional(),
       maxPrice: Joi.number().min(0).optional(),
@@ -211,23 +213,14 @@ class ProductController {
       sort: Joi.string().valid('createdAt', '-createdAt', 'price', '-price', 'name', '-name').default('-createdAt')
     });
 
-    const paginationSchema = Joi.object({
-      page: Joi.number().integer().min(1).default(1),
-      limit: Joi.number().integer().min(1).max(100).default(20)
-    });
-
-    const { error: filtersError, value: filters } = filtersSchema.validate(req.query);
-    const { error: paginationError, value: pagination } = paginationSchema.validate(req.query);
-
-    if (filtersError || paginationError) {
-      const error = filtersError || paginationError;
+    const { error, value } = filtersSchema.validate(req.query);
+    if (error) {
       return res.error(error.details[0].message, 400, 'VALIDATION_ERROR');
     }
 
-    const userRole = req.user ? req.user.role : null;
-    const result = await ProductService.getAllProducts(filters, pagination, userRole);
+    const result = await ProductService.getAllProducts(value);
     
-    res.success(result.products, 'Lista de productos obtenida exitosamente', result.pagination);
+    res.success(result, 'Lista de productos obtenida exitosamente');
   });
 
   /**
@@ -263,7 +256,7 @@ class ProductController {
    *       404:
    *         description: Producto no encontrado
    */
-  static getProductById = AsyncHandler(async (req, res) => {
+  static getProductById = asyncHandler(async (req, res) => {
     const userRole = req.user ? req.user.role : null;
     const product = await ProductService.getProductById(req.params.productId, userRole);
     
@@ -307,7 +300,7 @@ class ProductController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static createProduct = AsyncHandler(async (req, res) => {
+  static createProduct = asyncHandler(async (req, res) => {
     const createProductSchema = Joi.object({
       name: Joi.string().min(2).max(200).required(),
       sku: Joi.string().min(2).max(50).required(),
@@ -415,7 +408,7 @@ class ProductController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static updateProduct = AsyncHandler(async (req, res) => {
+  static updateProduct = asyncHandler(async (req, res) => {
     const updateProductSchema = Joi.object({
       name: Joi.string().min(2).max(200).optional(),
       description: Joi.string().min(10).optional(),
@@ -478,7 +471,7 @@ class ProductController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static deleteProduct = AsyncHandler(async (req, res) => {
+  static deleteProduct = asyncHandler(async (req, res) => {
     const result = await ProductService.deleteProduct(req.params.productId);
     
     res.success(result, 'Producto eliminado exitosamente');
@@ -540,7 +533,7 @@ class ProductController {
    *       400:
    *         description: Término de búsqueda inválido
    */
-  static searchProducts = AsyncHandler(async (req, res) => {
+  static searchProducts = asyncHandler(async (req, res) => {
     const searchSchema = Joi.object({
       q: Joi.string().min(2).required(),
       page: Joi.number().integer().min(1).default(1),
@@ -623,7 +616,7 @@ class ProductController {
    *       404:
    *         description: Categoría no encontrada
    */
-  static getProductsByCategory = AsyncHandler(async (req, res) => {
+  static getProductsByCategory = asyncHandler(async (req, res) => {
     const paginationSchema = Joi.object({
       page: Joi.number().integer().min(1).default(1),
       limit: Joi.number().integer().min(1).max(100).default(20),
@@ -675,7 +668,7 @@ class ProductController {
    *                   type: string
    *                   example: Productos destacados obtenidos exitosamente
    */
-  static getFeaturedProducts = AsyncHandler(async (req, res) => {
+  static getFeaturedProducts = asyncHandler(async (req, res) => {
     const limitSchema = Joi.object({
       limit: Joi.number().integer().min(1).max(50).default(10)
     });
@@ -725,7 +718,7 @@ class ProductController {
    *                   type: string
    *                   example: Productos populares obtenidos exitosamente
    */
-  static getPopularProducts = AsyncHandler(async (req, res) => {
+  static getPopularProducts = asyncHandler(async (req, res) => {
     const limitSchema = Joi.object({
       limit: Joi.number().integer().min(1).max(50).default(10)
     });
@@ -783,7 +776,7 @@ class ProductController {
    *       404:
    *         description: Producto no encontrado
    */
-  static getRelatedProducts = AsyncHandler(async (req, res) => {
+  static getRelatedProducts = asyncHandler(async (req, res) => {
     const limitSchema = Joi.object({
       limit: Joi.number().integer().min(1).max(20).default(5)
     });
@@ -861,7 +854,7 @@ class ProductController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static updateStock = AsyncHandler(async (req, res) => {
+  static updateStock = asyncHandler(async (req, res) => {
     const stockSchema = Joi.object({
       stockQty: Joi.number().integer().min(0).required(),
       operation: Joi.string().valid('set', 'add', 'subtract').default('set')
@@ -928,7 +921,7 @@ class ProductController {
    *       404:
    *         description: Producto no encontrado
    */
-  static checkStock = AsyncHandler(async (req, res) => {
+  static checkStock = asyncHandler(async (req, res) => {
     const quantitySchema = Joi.object({
       quantity: Joi.number().integer().min(1).default(1)
     });
@@ -996,7 +989,7 @@ class ProductController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static getProductStats = AsyncHandler(async (req, res) => {
+  static getProductStats = asyncHandler(async (req, res) => {
     const stats = await ProductService.getProductStats(req.params.productId);
     
     res.success(stats, 'Estadísticas del producto obtenidas exitosamente');
