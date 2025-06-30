@@ -57,7 +57,15 @@ const swaggerOptions = {
     servers: [
       {
         url: `http://20.245.229.182:${PORT}`,
-        description: 'Destello Shop API - Azure VM Server'
+        description: 'Destello Shop API - Azure VM Server (HTTP)'
+      },
+      {
+        url: `https://20.245.229.182:${PORT}`,
+        description: 'Destello Shop API - Azure VM Server (HTTPS)'
+      },
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Destello Shop API - Local Development'
       }
     ],
     components: {
@@ -163,7 +171,13 @@ app.use(autoFormatter); // Add res.success, res.error, etc.
 // ===== SWAGGER DOCUMENTATION =====
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Destello Shop API Documentation'
+  customSiteTitle: 'Destello Shop API Documentation',
+  swaggerOptions: {
+    url: '/api-docs/swagger.json',
+    docExpansion: 'list',
+    filter: true,
+    showRequestHeaders: true
+  }
 }));
 
 // ===== HEALTH CHECK ENDPOINTS =====
