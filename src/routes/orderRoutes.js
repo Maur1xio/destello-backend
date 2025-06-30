@@ -4,7 +4,42 @@ const { requireAuth, requireAdmin } = require('../middlewares');
 
 const router = express.Router();
 
-// ===== RUTAS DE USUARIO AUTENTICADO =====
+// ===== RUTAS ESPECÍFICAS PRIMERO (ANTES DE LAS RUTAS CON PARÁMETROS) =====
+
+/**
+ * @swagger
+ * /api/orders/from-cart:
+ *   post:
+ *     summary: Crear orden desde el carrito
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.post('/from-cart', requireAuth, OrderController.createOrderFromCart);
+
+/**
+ * @swagger
+ * /api/orders/all:
+ *   get:
+ *     summary: Obtener todas las órdenes (Admin)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get('/all', requireAuth, requireAdmin, OrderController.getAllOrders);
+
+/**
+ * @swagger
+ * /api/orders/stats:
+ *   get:
+ *     summary: Obtener estadísticas de órdenes (Admin)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get('/stats', requireAuth, requireAdmin, OrderController.getOrderStats);
+
+// ===== RUTAS GENERALES =====
 
 /**
  * @swagger
@@ -28,16 +63,7 @@ router.get('/', requireAuth, OrderController.getUserOrders);
  */
 router.post('/', requireAuth, OrderController.createOrder);
 
-/**
- * @swagger
- * /api/orders/from-cart:
- *   post:
- *     summary: Crear orden desde el carrito
- *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
- */
-router.post('/from-cart', requireAuth, OrderController.createOrderFromCart);
+// ===== RUTAS CON PARÁMETROS AL FINAL =====
 
 /**
  * @swagger
@@ -60,30 +86,6 @@ router.get('/:orderId', requireAuth, OrderController.getOrderById);
  *       - bearerAuth: []
  */
 router.put('/:orderId/cancel', requireAuth, OrderController.cancelOrder);
-
-// ===== RUTAS DE ADMINISTRADOR =====
-
-/**
- * @swagger
- * /api/orders/all:
- *   get:
- *     summary: Obtener todas las órdenes (Admin)
- *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
- */
-router.get('/all', requireAuth, requireAdmin, OrderController.getAllOrders);
-
-/**
- * @swagger
- * /api/orders/stats:
- *   get:
- *     summary: Obtener estadísticas de órdenes (Admin)
- *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
- */
-router.get('/stats', requireAuth, requireAdmin, OrderController.getOrderStats);
 
 /**
  * @swagger

@@ -74,6 +74,17 @@ router.post('/merge', requireAuth, CartController.mergeCart);
 
 /**
  * @swagger
+ * /api/cart/clear:
+ *   delete:
+ *     summary: Vaciar carrito completamente
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.delete('/clear', requireAuth, CartController.clearCart);
+
+/**
+ * @swagger
  * /api/cart/items/{productId}:
  *   put:
  *     summary: Actualizar cantidad de producto en el carrito
@@ -93,17 +104,6 @@ router.put('/items/:productId', requireAuth, CartController.updateCartItem);
  *       - bearerAuth: []
  */
 router.delete('/items/:productId', requireAuth, CartController.removeFromCart);
-
-/**
- * @swagger
- * /api/cart/clear:
- *   delete:
- *     summary: Vaciar carrito completamente
- *     tags: [Cart]
- *     security:
- *       - bearerAuth: []
- */
-router.delete('/clear', requireAuth, CartController.clearCart);
 
 /**
  * @swagger
