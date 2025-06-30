@@ -110,7 +110,7 @@ router.use('/reactions', reactionRoutes);
 router.use('/follows', followRoutes);
 
 // ===== 404 HANDLER FOR API ROUTES =====
-router.use('*', (req, res) => {
+router.use((req, res) => {
   res.error(
     `Ruta ${req.originalUrl} no encontrada`,
     404,
