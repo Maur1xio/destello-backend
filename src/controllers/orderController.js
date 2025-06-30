@@ -1,5 +1,5 @@
 const OrderService = require('../services/orderService');
-const { AsyncHandler } = require('../middlewares/errorHandler');
+const { asyncHandler, AppError } = require('../middlewares/errorHandler');
 const Joi = require('joi');
 
 /**
@@ -194,7 +194,7 @@ class OrderController {
    *       401:
    *         description: No autorizado
    */
-  static getUserOrders = AsyncHandler(async (req, res) => {
+  static getUserOrders = asyncHandler(async (req, res) => {
     const filtersSchema = Joi.object({
       status: Joi.string().valid('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed', 'cancelled').optional(),
       dateFrom: Joi.date().optional(),
@@ -283,7 +283,7 @@ class OrderController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static getAllOrders = AsyncHandler(async (req, res) => {
+  static getAllOrders = asyncHandler(async (req, res) => {
     const filtersSchema = Joi.object({
       status: Joi.string().valid('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed', 'cancelled').optional(),
       userId: Joi.string().optional(),
@@ -347,7 +347,7 @@ class OrderController {
    *       401:
    *         description: No autorizado
    */
-  static getOrderById = AsyncHandler(async (req, res) => {
+  static getOrderById = asyncHandler(async (req, res) => {
     const order = await OrderService.getOrderById(req.params.orderId, req.user);
     
     res.success(order, 'Orden obtenida exitosamente');
@@ -390,7 +390,7 @@ class OrderController {
    *       401:
    *         description: No autorizado
    */
-  static createOrder = AsyncHandler(async (req, res) => {
+  static createOrder = asyncHandler(async (req, res) => {
     const createOrderSchema = Joi.object({
       items: Joi.array().items(
         Joi.object({
@@ -482,7 +482,7 @@ class OrderController {
    *       401:
    *         description: No autorizado
    */
-  static createOrderFromCart = AsyncHandler(async (req, res) => {
+  static createOrderFromCart = asyncHandler(async (req, res) => {
     const createOrderFromCartSchema = Joi.object({
       shippingAddress: Joi.object({
         street: Joi.string().required(),
@@ -558,7 +558,7 @@ class OrderController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static updateOrderStatus = AsyncHandler(async (req, res) => {
+  static updateOrderStatus = asyncHandler(async (req, res) => {
     const updateStatusSchema = Joi.object({
       status: Joi.string().valid('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed', 'cancelled').required(),
       notes: Joi.string().optional()
@@ -623,7 +623,7 @@ class OrderController {
    *       401:
    *         description: No autorizado
    */
-  static cancelOrder = AsyncHandler(async (req, res) => {
+  static cancelOrder = asyncHandler(async (req, res) => {
     const cancelSchema = Joi.object({
       reason: Joi.string().optional()
     });
@@ -692,7 +692,7 @@ class OrderController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static updatePaymentStatus = AsyncHandler(async (req, res) => {
+  static updatePaymentStatus = asyncHandler(async (req, res) => {
     const updatePaymentSchema = Joi.object({
       paymentStatus: Joi.string().valid('pending', 'paid', 'failed', 'refunded').required(),
       transactionId: Joi.string().optional(),
@@ -770,7 +770,7 @@ class OrderController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static getOrderStats = AsyncHandler(async (req, res) => {
+  static getOrderStats = asyncHandler(async (req, res) => {
     const statsSchema = Joi.object({
       dateFrom: Joi.date().optional(),
       dateTo: Joi.date().optional(),
