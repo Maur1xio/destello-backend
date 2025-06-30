@@ -1,5 +1,5 @@
 const AuthService = require('../services/authService');
-const { AsyncHandler } = require('../middlewares/errorHandler');
+const { asyncHandler, AppError } = require('../middlewares/errorHandler');
 const { validate } = require('../middlewares/validation');
 const Joi = require('joi');
 
@@ -173,7 +173,7 @@ class AuthController {
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  static register = AsyncHandler(async (req, res) => {
+  static register = asyncHandler(async (req, res) => {
     const registerSchema = Joi.object({
       firstName: Joi.string().min(2).max(50).required(),
       lastName: Joi.string().min(2).max(50).required(),
@@ -234,7 +234,7 @@ class AuthController {
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  static login = AsyncHandler(async (req, res) => {
+  static login = asyncHandler(async (req, res) => {
     const loginSchema = Joi.object({
       email: Joi.string().email().required(),
       password: Joi.string().required()
@@ -254,7 +254,7 @@ class AuthController {
    * @swagger
    * /api/auth/profile:
    *   get:
-   *     summary: Obtener perfil del usuario autenticado
+   *     summary: Obtener perfil del usuario
    *     tags: [Auth]
    *     security:
    *       - bearerAuth: []
@@ -273,25 +273,26 @@ class AuthController {
    *                   $ref: '#/components/schemas/User'
    *                 message:
    *                   type: string
-   *                   example: Perfil obtenido exitosamente
+   *                   example: Perfil obtenido exitosamente  
    *       401:
-   *         description: No autorizado
+   *         description: Token no válido
    *         content:
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  static getProfile = AsyncHandler(async (req, res) => {
-    const profile = await AuthService.getProfile(req.user.id);
+  static getProfile = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const user = await AuthService.getUserById(userId);
     
-    res.success(profile, 'Perfil obtenido exitosamente');
+    res.success({ user }, 'Perfil obtenido exitosamente');
   });
 
   /**
    * @swagger
    * /api/auth/profile:
    *   put:
-   *     summary: Actualizar perfil del usuario autenticado
+   *     summary: Actualizar perfil del usuario
    *     tags: [Auth]
    *     security:
    *       - bearerAuth: []
@@ -328,35 +329,36 @@ class AuthController {
    *                 message:
    *                   type: string
    *                   example: Perfil actualizado exitosamente
-   *       400:
-   *         description: Datos de entrada inválidos
+   *       401:
+   *         description: Token no válido
    *         content:
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  static updateProfile = AsyncHandler(async (req, res) => {
-    const updateSchema = Joi.object({
+  static updateProfile = asyncHandler(async (req, res) => {
+    const updateProfileSchema = Joi.object({
       firstName: Joi.string().min(2).max(50).optional(),
       lastName: Joi.string().min(2).max(50).optional(),
       phone: Joi.string().optional()
     });
 
-    const { error, value } = updateSchema.validate(req.body);
+    const { error, value } = updateProfileSchema.validate(req.body);
     if (error) {
       return res.error(error.details[0].message, 400, 'VALIDATION_ERROR');
     }
 
-    const updatedProfile = await AuthService.updateProfile(req.user.id, value);
+    const userId = req.user.id;
+    const updatedUser = await AuthService.updateProfile(userId, value);
     
-    res.success(updatedProfile, 'Perfil actualizado exitosamente');
+    res.success({ user: updatedUser }, 'Perfil actualizado exitosamente');
   });
 
   /**
    * @swagger
    * /api/auth/change-password:
    *   put:
-   *     summary: Cambiar contraseña del usuario autenticado
+   *     summary: Cambiar contraseña
    *     tags: [Auth]
    *     security:
    *       - bearerAuth: []
@@ -391,14 +393,14 @@ class AuthController {
    *                 message:
    *                   type: string
    *                   example: Contraseña cambiada exitosamente
-   *       400:
+   *       401:
    *         description: Contraseña actual incorrecta
    *         content:
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  static changePassword = AsyncHandler(async (req, res) => {
+  static changePassword = asyncHandler(async (req, res) => {
     const changePasswordSchema = Joi.object({
       currentPassword: Joi.string().required(),
       newPassword: Joi.string().min(6).required()
@@ -409,7 +411,8 @@ class AuthController {
       return res.error(error.details[0].message, 400, 'VALIDATION_ERROR');
     }
 
-    await AuthService.changePassword(req.user.id, value.currentPassword, value.newPassword);
+    const userId = req.user.id;
+    await AuthService.changePassword(userId, value.currentPassword, value.newPassword);
     
     res.success(null, 'Contraseña cambiada exitosamente');
   });
@@ -418,7 +421,7 @@ class AuthController {
    * @swagger
    * /api/auth/addresses:
    *   get:
-   *     summary: Obtener direcciones del usuario autenticado
+   *     summary: Obtener direcciones del usuario
    *     tags: [Auth]
    *     security:
    *       - bearerAuth: []
@@ -441,17 +444,18 @@ class AuthController {
    *                   type: string
    *                   example: Direcciones obtenidas exitosamente
    */
-  static getAddresses = AsyncHandler(async (req, res) => {
-    const addresses = await AuthService.getAddresses(req.user.id);
+  static getAddresses = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const user = await AuthService.getUserById(userId);
     
-    res.success(addresses, 'Direcciones obtenidas exitosamente');
+    res.success(user.addresses || [], 'Direcciones obtenidas exitosamente');
   });
 
   /**
    * @swagger
    * /api/auth/addresses:
    *   post:
-   *     summary: Agregar nueva dirección al usuario autenticado
+   *     summary: Agregar nueva dirección
    *     tags: [Auth]
    *     security:
    *       - bearerAuth: []
@@ -460,33 +464,7 @@ class AuthController {
    *       content:
    *         application/json:
    *           schema:
-   *             type: object
-   *             required:
-   *               - street
-   *               - city
-   *               - state
-   *               - zipCode
-   *               - country
-   *             properties:
-   *               street:
-   *                 type: string
-   *                 description: Calle
-   *               city:
-   *                 type: string
-   *                 description: Ciudad
-   *               state:
-   *                 type: string
-   *                 description: Estado
-   *               zipCode:
-   *                 type: string
-   *                 description: Código postal
-   *               country:
-   *                 type: string
-   *                 description: País
-   *               isDefault:
-   *                 type: boolean
-   *                 description: Establecer como dirección por defecto
-   *                 default: false
+   *             $ref: '#/components/schemas/Address'
    *     responses:
    *       201:
    *         description: Dirección agregada exitosamente
@@ -504,7 +482,7 @@ class AuthController {
    *                   type: string
    *                   example: Dirección agregada exitosamente
    */
-  static addAddress = AsyncHandler(async (req, res) => {
+  static addAddress = asyncHandler(async (req, res) => {
     const addressSchema = Joi.object({
       street: Joi.string().required(),
       city: Joi.string().required(),
@@ -519,16 +497,17 @@ class AuthController {
       return res.error(error.details[0].message, 400, 'VALIDATION_ERROR');
     }
 
-    const address = await AuthService.addAddress(req.user.id, value);
+    const userId = req.user.id;
+    const newAddress = await AuthService.addAddress(userId, value);
     
-    res.status(201).success(address, 'Dirección agregada exitosamente');
+    res.status(201).success(newAddress, 'Dirección agregada exitosamente');
   });
 
   /**
    * @swagger
    * /api/auth/addresses/{addressId}:
    *   put:
-   *     summary: Actualizar dirección del usuario autenticado
+   *     summary: Actualizar dirección
    *     tags: [Auth]
    *     security:
    *       - bearerAuth: []
@@ -544,20 +523,7 @@ class AuthController {
    *       content:
    *         application/json:
    *           schema:
-   *             type: object
-   *             properties:
-   *               street:
-   *                 type: string
-   *               city:
-   *                 type: string
-   *               state:
-   *                 type: string
-   *               zipCode:
-   *                 type: string
-   *               country:
-   *                 type: string
-   *               isDefault:
-   *                 type: boolean
+   *             $ref: '#/components/schemas/Address'
    *     responses:
    *       200:
    *         description: Dirección actualizada exitosamente
@@ -575,7 +541,7 @@ class AuthController {
    *                   type: string
    *                   example: Dirección actualizada exitosamente
    */
-  static updateAddress = AsyncHandler(async (req, res) => {
+  static updateAddress = asyncHandler(async (req, res) => {
     const addressSchema = Joi.object({
       street: Joi.string().optional(),
       city: Joi.string().optional(),
@@ -590,16 +556,18 @@ class AuthController {
       return res.error(error.details[0].message, 400, 'VALIDATION_ERROR');
     }
 
-    const address = await AuthService.updateAddress(req.user.id, req.params.addressId, value);
+    const userId = req.user.id;
+    const addressId = req.params.addressId;
+    const updatedAddress = await AuthService.updateAddress(userId, addressId, value);
     
-    res.success(address, 'Dirección actualizada exitosamente');
+    res.success(updatedAddress, 'Dirección actualizada exitosamente');
   });
 
   /**
    * @swagger
    * /api/auth/addresses/{addressId}:
    *   delete:
-   *     summary: Eliminar dirección del usuario autenticado
+   *     summary: Eliminar dirección
    *     tags: [Auth]
    *     security:
    *       - bearerAuth: []
@@ -625,8 +593,10 @@ class AuthController {
    *                   type: string
    *                   example: Dirección eliminada exitosamente
    */
-  static removeAddress = AsyncHandler(async (req, res) => {
-    await AuthService.removeAddress(req.user.id, req.params.addressId);
+  static removeAddress = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const addressId = req.params.addressId;
+    await AuthService.removeAddress(userId, addressId);
     
     res.success(null, 'Dirección eliminada exitosamente');
   });

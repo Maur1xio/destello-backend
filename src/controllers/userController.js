@@ -1,5 +1,5 @@
 const UserService = require('../services/userService');
-const { AsyncHandler } = require('../middlewares/errorHandler');
+const { asyncHandler, AppError } = require('../middlewares/errorHandler');
 const Joi = require('joi');
 
 /**
@@ -150,7 +150,7 @@ class UserController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static getAllUsers = AsyncHandler(async (req, res) => {
+  static getAllUsers = asyncHandler(async (req, res) => {
     const filtersSchema = Joi.object({
       search: Joi.string().optional(),
       role: Joi.string().valid('user', 'admin').optional(),
@@ -213,7 +213,7 @@ class UserController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static getUserById = AsyncHandler(async (req, res) => {
+  static getUserById = asyncHandler(async (req, res) => {
     const user = await UserService.getUserById(req.params.userId, req.user);
     
     res.success(user, 'Usuario obtenido exitosamente');
@@ -282,7 +282,7 @@ class UserController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static createUser = AsyncHandler(async (req, res) => {
+  static createUser = asyncHandler(async (req, res) => {
     const createUserSchema = Joi.object({
       firstName: Joi.string().min(2).max(50).required(),
       lastName: Joi.string().min(2).max(50).required(),
@@ -358,7 +358,7 @@ class UserController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static updateUser = AsyncHandler(async (req, res) => {
+  static updateUser = asyncHandler(async (req, res) => {
     const updateUserSchema = Joi.object({
       firstName: Joi.string().min(2).max(50).optional(),
       lastName: Joi.string().min(2).max(50).optional(),
@@ -412,7 +412,7 @@ class UserController {
    *       400:
    *         description: No se puede eliminar a si mismo
    */
-  static deleteUser = AsyncHandler(async (req, res) => {
+  static deleteUser = asyncHandler(async (req, res) => {
     await UserService.deleteUser(req.params.userId, req.user.id);
     
     res.success(null, 'Usuario eliminado exitosamente');
@@ -454,7 +454,7 @@ class UserController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static activateUser = AsyncHandler(async (req, res) => {
+  static activateUser = asyncHandler(async (req, res) => {
     const user = await UserService.activateUser(req.params.userId);
     
     res.success(user, 'Usuario activado exitosamente');
@@ -498,7 +498,7 @@ class UserController {
    *       400:
    *         description: No se puede desactivar a si mismo
    */
-  static deactivateUser = AsyncHandler(async (req, res) => {
+  static deactivateUser = asyncHandler(async (req, res) => {
     const user = await UserService.deactivateUser(req.params.userId, req.user.id);
     
     res.success(user, 'Usuario desactivado exitosamente');
@@ -556,7 +556,7 @@ class UserController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static searchUsers = AsyncHandler(async (req, res) => {
+  static searchUsers = asyncHandler(async (req, res) => {
     const searchSchema = Joi.object({
       q: Joi.string().min(2).required(),
       page: Joi.number().integer().min(1).default(1),
@@ -612,7 +612,7 @@ class UserController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static getUserStats = AsyncHandler(async (req, res) => {
+  static getUserStats = asyncHandler(async (req, res) => {
     const stats = await UserService.getUserStats(req.params.userId);
     
     res.success(stats, 'Estadísticas del usuario obtenidas exitosamente');
@@ -666,7 +666,7 @@ class UserController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static getUserActivity = AsyncHandler(async (req, res) => {
+  static getUserActivity = asyncHandler(async (req, res) => {
     const activity = await UserService.getUserActivity(req.params.userId);
     
     res.success(activity, 'Actividad del usuario obtenida exitosamente');

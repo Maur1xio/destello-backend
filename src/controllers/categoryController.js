@@ -1,5 +1,5 @@
 const CategoryService = require('../services/categoryService');
-const { AsyncHandler } = require('../middlewares/errorHandler');
+const { asyncHandler, AppError } = require('../middlewares/errorHandler');
 const Joi = require('joi');
 
 /**
@@ -132,7 +132,7 @@ class CategoryController {
    *                   type: string
    *                   example: Lista de categorías obtenida exitosamente
    */
-  static getAllCategories = AsyncHandler(async (req, res) => {
+  static getAllCategories = asyncHandler(async (req, res) => {
     const filtersSchema = Joi.object({
       hierarchy: Joi.boolean().default(false),
       includeInactive: Joi.boolean().default(false),
@@ -196,7 +196,7 @@ class CategoryController {
    *       404:
    *         description: Categoría no encontrada
    */
-  static getCategoryById = AsyncHandler(async (req, res) => {
+  static getCategoryById = asyncHandler(async (req, res) => {
     const optionsSchema = Joi.object({
       includeChildren: Joi.boolean().default(false),
       includeProducts: Joi.boolean().default(false)
@@ -207,8 +207,7 @@ class CategoryController {
       return res.error(error.details[0].message, 400, 'VALIDATION_ERROR');
     }
 
-    const userRole = req.user ? req.user.role : null;
-    const category = await CategoryService.getCategoryById(req.params.categoryId, value, userRole);
+    const category = await CategoryService.getCategoryById(req.params.categoryId, value);
     
     res.success(category, 'Categoría obtenida exitosamente');
   });
@@ -258,7 +257,7 @@ class CategoryController {
    *       404:
    *         description: Categoría no encontrada
    */
-  static getCategoryBySlug = AsyncHandler(async (req, res) => {
+  static getCategoryBySlug = asyncHandler(async (req, res) => {
     const optionsSchema = Joi.object({
       includeChildren: Joi.boolean().default(false),
       includeProducts: Joi.boolean().default(false)
@@ -312,7 +311,7 @@ class CategoryController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static createCategory = AsyncHandler(async (req, res) => {
+  static createCategory = asyncHandler(async (req, res) => {
     const createCategorySchema = Joi.object({
       name: Joi.string().min(2).max(100).required(),
       description: Joi.string().min(10).required(),
@@ -387,7 +386,7 @@ class CategoryController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static updateCategory = AsyncHandler(async (req, res) => {
+  static updateCategory = asyncHandler(async (req, res) => {
     const updateCategorySchema = Joi.object({
       name: Joi.string().min(2).max(100).optional(),
       description: Joi.string().min(10).optional(),
@@ -441,7 +440,7 @@ class CategoryController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static deleteCategory = AsyncHandler(async (req, res) => {
+  static deleteCategory = asyncHandler(async (req, res) => {
     const result = await CategoryService.deleteCategory(req.params.categoryId);
     
     res.success(result, 'Categoría eliminada exitosamente');
@@ -486,7 +485,7 @@ class CategoryController {
    *                   type: string
    *                   example: Estructura jerárquica obtenida exitosamente
    */
-  static getCategoryHierarchy = AsyncHandler(async (req, res) => {
+  static getCategoryHierarchy = asyncHandler(async (req, res) => {
     const optionsSchema = Joi.object({
       includeInactive: Joi.boolean().default(false),
       includeProductCount: Joi.boolean().default(true)
@@ -544,7 +543,7 @@ class CategoryController {
    *       404:
    *         description: Categoría padre no encontrada
    */
-  static getCategoryChildren = AsyncHandler(async (req, res) => {
+  static getCategoryChildren = asyncHandler(async (req, res) => {
     const optionsSchema = Joi.object({
       includeInactive: Joi.boolean().default(false)
     });
@@ -604,7 +603,7 @@ class CategoryController {
    *       404:
    *         description: Categoría no encontrada
    */
-  static getCategoryAncestors = AsyncHandler(async (req, res) => {
+  static getCategoryAncestors = asyncHandler(async (req, res) => {
     const ancestors = await CategoryService.getCategoryAncestors(req.params.categoryId);
     
     res.success(ancestors, 'Ruta de ancestros obtenida exitosamente');
@@ -654,7 +653,7 @@ class CategoryController {
    *       400:
    *         description: Término de búsqueda inválido
    */
-  static searchCategories = AsyncHandler(async (req, res) => {
+  static searchCategories = asyncHandler(async (req, res) => {
     const searchSchema = Joi.object({
       q: Joi.string().min(2).required(),
       includeInactive: Joi.boolean().default(false)
@@ -716,7 +715,7 @@ class CategoryController {
    *       403:
    *         description: Acceso denegado - Solo administradores
    */
-  static getCategoryStats = AsyncHandler(async (req, res) => {
+  static getCategoryStats = asyncHandler(async (req, res) => {
     const stats = await CategoryService.getCategoryStats();
     
     res.success(stats, 'Estadísticas de categorías obtenidas exitosamente');

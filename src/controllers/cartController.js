@@ -1,5 +1,5 @@
 const CartService = require('../services/cartService');
-const { AsyncHandler } = require('../middlewares/errorHandler');
+const { asyncHandler, AppError } = require('../middlewares/errorHandler');
 const Joi = require('joi');
 
 /**
@@ -123,7 +123,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static getCart = AsyncHandler(async (req, res) => {
+  static getCart = asyncHandler(async (req, res) => {
     const cart = await CartService.getCart(req.user.id);
     
     res.success(cart, 'Carrito obtenido exitosamente');
@@ -166,7 +166,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static addToCart = AsyncHandler(async (req, res) => {
+  static addToCart = asyncHandler(async (req, res) => {
     const addToCartSchema = Joi.object({
       productId: Joi.string().required(),
       quantity: Joi.number().integer().min(1).required()
@@ -226,7 +226,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static updateCartItem = AsyncHandler(async (req, res) => {
+  static updateCartItem = asyncHandler(async (req, res) => {
     const updateItemSchema = Joi.object({
       quantity: Joi.number().integer().min(1).required()
     });
@@ -277,7 +277,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static removeFromCart = AsyncHandler(async (req, res) => {
+  static removeFromCart = asyncHandler(async (req, res) => {
     const cart = await CartService.removeFromCart(req.user.id, req.params.productId);
     
     res.success(cart, 'Producto eliminado del carrito exitosamente');
@@ -310,7 +310,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static clearCart = AsyncHandler(async (req, res) => {
+  static clearCart = asyncHandler(async (req, res) => {
     const cart = await CartService.clearCart(req.user.id);
     
     res.success(cart, 'Carrito vaciado exitosamente');
@@ -365,7 +365,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static validateCart = AsyncHandler(async (req, res) => {
+  static validateCart = asyncHandler(async (req, res) => {
     const validation = await CartService.validateCart(req.user.id);
     
     res.success(validation, 'Carrito validado exitosamente');
@@ -422,7 +422,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static mergeCart = AsyncHandler(async (req, res) => {
+  static mergeCart = asyncHandler(async (req, res) => {
     const mergeSchema = Joi.object({
       items: Joi.array().items(
         Joi.object({
@@ -483,7 +483,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static moveToWishlist = AsyncHandler(async (req, res) => {
+  static moveToWishlist = asyncHandler(async (req, res) => {
     const result = await CartService.moveToWishlist(req.user.id, req.params.productId);
     
     res.success(result, 'Producto movido a lista de deseos exitosamente');
@@ -533,7 +533,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static getCartSummary = AsyncHandler(async (req, res) => {
+  static getCartSummary = asyncHandler(async (req, res) => {
     const summary = await CartService.getCartSummary(req.user.id);
     
     res.success(summary, 'Resumen del carrito obtenido exitosamente');
@@ -573,7 +573,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static getCartItemCount = AsyncHandler(async (req, res) => {
+  static getCartItemCount = asyncHandler(async (req, res) => {
     const count = await CartService.getCartItemCount(req.user.id);
     
     res.success(count, 'Conteo obtenido exitosamente');
@@ -623,7 +623,7 @@ class CartController {
    *       401:
    *         description: No autorizado
    */
-  static checkProductInCart = AsyncHandler(async (req, res) => {
+  static checkProductInCart = asyncHandler(async (req, res) => {
     const result = await CartService.checkProductInCart(req.user.id, req.params.productId);
     
     res.success(result, 'Verificación completada exitosamente');
