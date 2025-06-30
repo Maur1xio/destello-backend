@@ -3,7 +3,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
 // ===== IMPORT CONFIGURATION =====
-const { connectDB } = require('./config/database');
+const connectDB = require('./config/database');
 const { PORT, NODE_ENV, API_VERSION } = require('./config/constants');
 
 const {
