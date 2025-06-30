@@ -34,6 +34,28 @@ const SHIPMENT_STATUS = {
   RETURNED: 'returned'
 };
 
+const SHIPMENT_CARRIERS = {
+  DHL: 'dhl',
+  FEDEX: 'fedex',
+  UPS: 'ups',
+  CORREOS_MEXICO: 'correos_mexico',
+  PAQUETEXPRESS: 'paquetexpress'
+};
+
+const PAYMENT_METHODS = {
+  CREDIT_CARD: 'credit_card',
+  DEBIT_CARD: 'debit_card',
+  PAYPAL: 'paypal',
+  BANK_TRANSFER: 'bank_transfer'
+};
+
+const PAYMENT_STATUS = {
+  PENDING: 'pending',
+  PAID: 'paid',
+  FAILED: 'failed',
+  REFUNDED: 'refunded'
+};
+
 // ===== INVENTORY CONSTANTS =====
 const INVENTORY_TX_TYPES = {
   PURCHASE: 'purchase',
@@ -70,7 +92,10 @@ module.exports = {
   USER_ROLES,
   ORDER_STATUS,
   SHIPMENT_STATUS,
+  SHIPMENT_CARRIERS,
   INVENTORY_TX_TYPES,
   REACTION_TYPES,
-  TARGET_TYPES
+  TARGET_TYPES,
+  PAYMENT_METHODS,
+  PAYMENT_STATUS
 }; 

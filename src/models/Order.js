@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { ORDER_STATUS } = require('../config/constants');
+const { ORDER_STATUS, PAYMENT_METHODS, PAYMENT_STATUS } = require('../config/constants');
 
 // ===== SUBDOCUMENT SCHEMAS =====
 const OrderItemSchema = new mongoose.Schema({
@@ -72,13 +72,13 @@ const OrderSchema = new mongoose.Schema({
   }],
   paymentMethod: {
     type: String,
-    enum: ['credit_card', 'debit_card', 'paypal', 'bank_transfer'],
+    enum: Object.values(PAYMENT_METHODS),
     required: true
   },
   paymentStatus: {
     type: String,
-    enum: ['pending', 'paid', 'failed', 'refunded'],
-    default: 'pending'
+    enum: Object.values(PAYMENT_STATUS),
+    default: PAYMENT_STATUS.PENDING
   },
   notes: {
     type: String,
